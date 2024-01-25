@@ -1,2 +1,2 @@
 # ICoN
-Integration using Co-attention across Biological Networks
+Integration using Co-attention across biological Networks
