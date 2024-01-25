@@ -1,0 +1,36 @@
+{
+  "net_names": [
+    "inputs/Costanzo-2016.txt",
+    "inputs/Hu-2007.txt",
+    "inputs/Krogan-2006.txt"
+  ],
+  "out_name": "outputs/ICON/yeast_gi_coex_ppi",
+  "epochs":3000,
+  "batch_size": 2048,
+  "learning_rate": 0.0005,
+  "embedding_size": 512,
+  "gat_shapes": {
+    "dimension": 68,
+    "n_heads": 10,
+    "n_layers": 3,
+    "dropout": 0.4,
+    "decay": 0,
+    "free_layers": 0
+  },
+
+  "neighbor_sample_size": [2],
+  "save_model": false,
+  "residual": true,
+  "pre_gat_type": "single",
+  "gat_type": "single_sep",
+  "scale": "sep",
+
+
+  "loss_type": "single",
+  "feat_type": "one-hot",
+  "norm_adj": false,
+  "bmask": false,
+  "init_mode": "max_own",
+  "agg": "avg",
+  "noise": [[0.5,0.5]]
+}

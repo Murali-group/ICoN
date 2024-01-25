@@ -1,0 +1,17 @@
+torch-geometric/
+.vscode/
+__pycache__/
+outputs/*
+dist/
+activate.sh
+slurm*
+run_sbatch.sh
+*.whl
+code/runs/
+code/wandb/
+code/tests/
+
+!.gitkeep
+!src/outputs/features/.gitkeep
+!src/outputs/models/.gitkeep
+!src/outputs/plots/.gitkeep
