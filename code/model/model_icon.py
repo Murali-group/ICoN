@@ -1,158 +1,20 @@
 import copy
 import time
-import cProfile
+
 import warnings
-import numpy as np
-import torch
 import torch.nn as nn
-from torch import Tensor
-from torch_geometric.data import Data
 import torch.nn.functional as F
 
-from torch_sparse import SparseTensor
-from utils.sampler import Adj
 from utils.common import Device
 from typing import Dict, List, Tuple, Optional
-from .layers import WGATConv, CoAttnWGATConv, ComboWGATConv,  Interp, NetWeights
+from .layers import ComboWGATConv,  Interp, NetWeights
 from .model_utils import *
-
-class IconGAT(nn.Module):
-    def __init__(self, in_size: int, gat_shapes: Dict[str, int], alpha: float = 0.1):
-        """BIONIC network encoder module.
-
-        Args:
-            in_size (int): Number of nodes in input networks.
-            gat_shapes (Dict[str, int]): Graph attention layer hyperparameters.
-            alpha (float, optional): LeakyReLU negative slope. Defaults to 0.1.
-
-        Returns:
-            Tensor: 2D tensor of node features. Each row is a node, each column is a feature.
-        """
-        super(IconGAT, self).__init__()
-        self.in_size = in_size
-        self.dimension: int = gat_shapes["dimension"]
-        self.n_heads: int = gat_shapes["n_heads"]
-        self.alpha = alpha
-        self.dropout = gat_shapes["dropout"]
-
-        self.gat = WGATConv(
-            (self.dimension * self.n_heads,) * 2,
-            self.dimension,
-            heads=self.n_heads,
-            dropout=self.dropout,
-            negative_slope=self.alpha,
-            add_self_loops=True,
-        )
-
-    def forward(self, data_flow, layer_no, x= None, device=None):
-        _, n_id, adjs = data_flow
-        if device is None:
-            device = Device()
-
-        adj = adjs[layer_no].to(device)
-
-        if layer_no == 0: #taking only the features for the current node under
-            # consideration as at the first layer whole
-            #feature matrix for all nodes has been passed.
-            x = x[n_id]
-
-        #Nure: return attention weight
-        x, attn = self.gat((x, x[: adj.size[1]]), adj.edge_index,
-                    size=adj.size, edge_weights=adj.weights, return_attention_weights=True)
-        return attn
-
-
-class IconCoGAT(nn.Module):
-    def __init__(self, in_size: int,  net_idx:int, n_modalities:int, gat_shapes: Dict[str, int], alpha: float = 0.1,
-                net_weights =None):
-        """BIONIC network encoder module.
-        Args:
-            in_size (int): Number of nodes in input networks.
-            n_modalities (int): Number of networks.
-            gat_shapes (Dict[str, int]): Graph attention layer hyperparameters.
-            alpha (float, optional): LeakyReLU negative slope. Defaults to 0.1.
-
-        Returns:
-            Tensor: 2D tensor of node features. Each row is a node, each column is a feature.
-        """
-        super(IconCoGAT, self).__init__()
-        self.in_size = in_size
-        self.dimension: int = gat_shapes["dimension"]
-        self.n_heads: int = gat_shapes["n_heads"]
-        self.dropout = gat_shapes["dropout"]
-
-        # self.n_layers: int = gat_shapes["n_layers"]
-        self.alpha = alpha
-        # self.pre_gat = nn.Linear(self.in_size, self.dimension * self.n_heads)
-        self.net_idx = net_idx
-        self.gat = CoAttnWGATConv(
-            (self.dimension * self.n_heads,) * 2,
-            self.dimension,
-            heads=self.n_heads,
-            dropout=self.dropout,
-            negative_slope=self.alpha,
-            add_self_loops=False,
-        )
-
-        self.net_weights = net_weights
-        # def set_net_scale(self, n_modalities, net_idx, init_mode):
-        #     #Define a learnable weight vector co_W of size m where  m=number of input networks.
-        #     self.net_weights = NetWeights(n_modalities, net_idx, init_mode)
-
-    def forward(self, data_flow, attns, edge_indices_global, layer_no, x, device=None, mmode='icon'):
-        net_weights = self.net_weights()#give normalized netweights
-        cogat_edge_idx_global={}
-        #TODO define w_cogat_attn as module dict
-        w_cogat_attn={}
-
-        if mmode=='bionic': #just take own attention into account
-            cogat_attn = attns[self.net_idx][1]
-            cogat_edge_idx_global[self.net_idx] = edge_indices_global[self.net_idx]
-            # Multiply cogat_attn with co_W
-            w_cogat_attn[self.net_idx] = cogat_attn #put weight = 1
-        else: #take attention from all inout networks
-            for net_idx in attns:
-                cogat_attn = attns[net_idx][1]
-                cogat_edge_idx_global[net_idx] = edge_indices_global[net_idx]
-                #Multiply cogat_attn with co_W
-                w_cogat_attn[net_idx] = net_weights[:, net_idx]*cogat_attn
-
-        ##***************** WITHOUT MMODE*****************
-        # aggregate attention value of the same edges across networks. Compute final attns across edges.
-        # and use that for following part.
-        # TODO: this aggregat_edge_weights() function is a problem. Fix it.
-        agg_attn_mat = aggregat_edge_weights(w_cogat_attn, cogat_edge_idx_global,
-                                             self.in_size, self.n_heads, device='cuda')
-
-        _, n_id, adjs = data_flow
-        if device is None:
-            device = Device()
-
-        adj = adjs[layer_no].to(device)
-        local_edge_index = edge_idx_from_global_to_local(agg_attn_mat.indices(), n_id)
-
-        if layer_no == 0: #taking only the features for the current node under consideration as at the first layer whole
-            #feature matrix for all nodes has been passed.
-            x = x[n_id]
-        x = self.gat((x, x[: adj.size[1]]), local_edge_index.to(device),
-                     alpha=agg_attn_mat.values().to(device), size=adj.size)
-        return x
-
 
 class IconCombo(nn.Module):
     # def __init__(self, in_size: int,  net_idx:int, n_modalities:int, gat_shapes: Dict[str, int], alpha: float = 0.1):
     def __init__(self, in_size: int, gat_shapes: Dict[str, int], alpha: float = 0.1,
             net_weights =None, dropout=None):
-        """BIONIC network encoder module.
-        Args:
-            in_size (int): Number of nodes in input networks.
-            n_modalities (int): Number of networks.
-            gat_shapes (Dict[str, int]): Graph attention layer hyperparameters.
-            alpha (float, optional): LeakyReLU negative slope. Defaults to 0.1.
 
-        Returns:
-            Tensor: 2D tensor of node features. Each row is a node, each column is a feature.
-        """
         super(IconCombo, self).__init__()
         self.in_size = in_size
         self.dimension: int = gat_shapes["dimension"]
@@ -276,7 +138,7 @@ class Icon(nn.Module):
         self.residual = residual
         self.alpha = alpha
         self.n_modalities = n_modalities
-        self.bionic_mask = bionic_mask
+        # self.bionic_mask = bionic_mask
         self.svd_dim = svd_dim
         self.shared_encoder = shared_encoder
         self.n_classes = n_classes
@@ -360,38 +222,7 @@ class Icon(nn.Module):
                 net_weights[k][0] = NetWeights(self.n_modalities, 0,
                                                'uniform', self.con)  # initiate with same weight for each network. irrespective of self.init_mode
 
-        if self.gat_type == 'sep_sep':
-            for i in range(self.n_modalities):
-                # self.encoders[i] = []
-                for k in range(self.n_layers):
-                    self.encoders[i].append(IconGAT(self.in_size, self.gat_shapes, self.alpha))
-                    self.add_module(f"Encoder_{i}_{k}", self.encoders[i][k])
-            # Co-GATS
-            for i in range(self.n_modalities):
-                self.co_encoders[i] = []
-                for k in range(self.n_layers):
-                    self.co_encoders[i].append(IconCoGAT(self.in_size, i, self.n_modalities,self.gat_shapes, self.alpha,
-                        net_weights[k][i] if i in net_weights[k] else net_weights[k][0] ))
-                    self.add_module(f"Co_Encoder_{i}_{k}", self.co_encoders[i][k])
-
-        elif self.gat_type=='sep_single':#if gat_type='sep_single' then the first part 'sep'
-            # means for the same network, in the same layer
-            # we have different learnable W i.e., two GATConv for GAT and CO-GAT.
-            # The second part 'single' means for the same network we use the same learnable W
-            # across all GAT layers.
-            # GATs
-            for i in range(self.n_modalities):
-                # self.encoders[i] = []
-                self.encoders[i].append(IconGAT(self.in_size, self.gat_shapes, self.alpha))
-                self.add_module(f"Encoder_{i}_0",self.encoders[i][0] )
-            #Co-GATS
-            for i in range(self.n_modalities):
-                self.co_encoders[i] = []
-                self.co_encoders[i].append(IconCoGAT(self.in_size, i, self.n_modalities, self.gat_shapes, self.alpha,
-                            net_weights[0][i] if i in net_weights[0] else net_weights[0][0]))
-                self.add_module(f"Co_Encoder_{i}_0", self.co_encoders[i][0])
-
-        elif self.gat_type == 'single_sep':
+        if self.gat_type == 'single_sep':
             for i in range(self.n_modalities):
                 # self.encoders[i] = []
                 for k in range(self.n_layers):
@@ -440,32 +271,13 @@ class Icon(nn.Module):
         evaluate: bool = False,
         rand_net_idxs: Optional[np.ndarray] = None,
     ):
-        """Forward pass logic.
 
-        Args:
-            data_flows (List[Tuple[int, Tensor, List[Adj]]]): Sampled bi-partite data flows.
-                See PyTorch Geometric documentation for more details.
-            masks (Tensor): 2D masks indicating which nodes (rows) are in which networks (columns)
-            evaluate (bool, optional): Used to turn off random sampling in forward pass.
-                Defaults to False.
-            rand_net_idxs (np.ndarray, optional): Indices of networks if networks are being
-                sampled. Defaults to None.
 
-        Returns:
-            Tensor: 2D tensor of final reconstruction to be used in loss function.
-            Tensor: 2D tensor of integrated node features. Each row is a node, each column is a feature.
-            List[Tensor]: Pre-integration network-specific node feature tensors. Not currently
-                implemented.
-            Tensor: Learned network scaling coefficients.
-            Tensor or None: 2D tensor of label predictions if using supervision.
-        """
         if rand_net_idxs is not None:
             idxs = rand_net_idxs
         else:
             idxs = list(range(self.n_modalities))
-        net_scales, interp_masks = self.interp(masks, idxs, evaluate)
-        # Define encoder logic.
-        out_pre_cat_layers = []  # Final layers before concatenation, not currently used
+        net_scales, _ = self.interp(masks, idxs, evaluate)
 
         batch_size = data_flows[0][0]
 
@@ -561,10 +373,7 @@ class Icon(nn.Module):
                 x = x_cogats[n_layers-1][net_idx]
 
             if self.agg == 'avg':
-                if self.bionic_mask:
-                    x = net_scales[:, net_idx] * interp_masks[:, net_idx].reshape((-1, 1)) * x
-                else:
-                    x = net_scales[:, net_idx] * x
+                x = net_scales[:, net_idx] * x
 
             xs.append(x)
 
@@ -591,87 +400,3 @@ class Icon(nn.Module):
         return dot, emb, None, net_scales, classes, sum_diff, diffs, norm_diffs, sum_norm_diff, agg_attn_mats
 
 
-class IconParallel(Icon):
-    def __init__(self, *args, **kwargs):
-        """A GPU parallelized version of `Bionic`. See `Bionic` for arguments. 
-        """
-        super(IconParallel, self).__init__(*args, **kwargs)
-
-        self.cuda_count = torch.cuda.device_count()
-
-        # split network indices into `cuda_count` chunks
-        self.net_idx_splits = torch.tensor_split(torch.arange(len(self.encoders)), self.cuda_count)
-
-        # create a dictionary mapping from network idx to cuda device idx
-        self.net_to_cuda_mapper = {}
-
-        # distribute encoders across GPUs
-        encoders = []
-        for cuda_idx, split in enumerate(self.net_idx_splits):
-            split_encoders = [self.encoders[idx].to(f"cuda:{cuda_idx}") for idx in split]
-            encoders += split_encoders
-            for idx in split:
-                self.net_to_cuda_mapper[idx.item()] = cuda_idx
-        self.encoders = encoders
-
-        for i, enc_module in enumerate(self.encoders):
-            self.add_module(f"Encoder_{i}", enc_module)
-
-        # put remaining tensors on first GPU
-        self.emb = self.emb.to("cuda:0")
-        self.interp = self.interp.to("cuda:0")
-
-        if self.cls_heads is not None:
-            self.cls_heads = [head.to("cuda:0") for head in self.cls_heads]
-
-            for h, cls_head in enumerate(self.cls_heads):
-                self.add_module(f"Classification_Head_{h}", cls_head)
-
-    def forward(
-        self,
-        data_flows: List[Tuple[int, Tensor, List[Adj]]],
-        masks: Tensor,
-        evaluate: bool = False,
-        rand_net_idxs: Optional[np.ndarray] = None,
-    ):
-        """See `Bionic` forward methods for argument details.
-        """
-        if rand_net_idxs is not None:
-            raise NotImplementedError("Network sampling is not used with model parallelism.")
-
-        idxs = list(range(self.n_modalities))
-        net_scales, interp_masks = self.interp(masks, idxs, evaluate, device="cuda:0")
-
-        # Define encoder logic.
-        out_pre_cat_layers = []  # Final layers before concatenation, not currently used
-
-        batch_size = data_flows[0][0]
-        x_store_modality = torch.zeros(
-            (batch_size, self.integration_size), device="cuda:0"
-        )  # Tensor to store results from each modality.
-
-        # Iterate over input networks
-        for i, data_flow in enumerate(data_flows):
-            if self.shared_encoder:
-                net_idx = 0
-            else:
-                net_idx = idxs[i]
-            device = f"cuda:{self.net_to_cuda_mapper[net_idx]}"
-
-            x = self.encoders[net_idx](data_flow, device).to("cuda:0")
-            # x = net_scales[:, i] * interp_masks[:, i].reshape((-1, 1)) * x
-            x_store_modality += x
-
-        # Embedding
-        emb = self.emb(x_store_modality)
-
-        # Dot product (network reconstruction)
-        dot = torch.mm(emb, torch.t(emb))
-
-        # Classification (if standards are provided)
-        if self.cls_heads:
-            classes = [head(emb) for head in self.cls_heads]
-        else:
-            classes = None
-
-        return dot, emb, out_pre_cat_layers, net_scales, classes

@@ -80,8 +80,3 @@ class NeighborSamplerWithWeights(NeighborSampler):
             weights = self.weights[e_id]
             adjs.append(Adj(edge_index, e_id, weights, size))
         return batch_size, n_id, adjs[::-1]
-
-        # if len(adjs) > 1:
-        #     return batch_size, n_id, adjs[::-1]
-        # else:
-        #     return batch_size, n_id, adjs[0]
