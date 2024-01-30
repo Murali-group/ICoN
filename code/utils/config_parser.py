@@ -7,7 +7,7 @@ from argparse import Namespace
 
 
 class DefaultConfig:
-    """Defines the default BIONIC config parameters."""
+    """Defines the default ICON config parameters."""
 
     # Default config parameters used unless specified by user
     _defaults = {
@@ -24,7 +24,7 @@ class DefaultConfig:
         "residual": True,
         "shared_encoder": False,  # Whether all networks should use the same encoder
         "svd_dim": 0,  # Deprecated. Will be safely ignored.
-        "initialization": "kaiming",  # Method used to initialize BIONIC weights
+        "initialization": "kaiming",  # Method used to initialize ICON weights
         "lambda": None,  # Final loss is `lambda` * `rec_loss` + (1 - `lambda`) * `cls_loss`
         "neighbor_sample_size": 2,  # Number of neighbors to sample per node each epoch
         "pre_gat_type": "single",
@@ -32,8 +32,6 @@ class DefaultConfig:
         "scale": "sep",
         "feat_type" :'one-hot',
         "con": True,
-        # "model_mode": 'icon', #act as a bionic model as in use own attention only
-
         "gat_shapes": {
             "dimension": 64,  # Dimension of each GAT layer
             "n_heads": 10,  # Number of attention heads for each GAT layer

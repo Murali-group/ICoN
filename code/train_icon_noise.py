@@ -31,15 +31,6 @@ from model.model_utils import  *
 
 class Trainer:
     def __init__(self, config: Union[Path, dict]):
-        """Defines the relevant training and forward pass logic for BIONIC.
-
-        A model is trained by calling `train()` and the resulting gene embeddings are
-        obtained by calling `forward()`.
-
-        Args:
-            config (Union[Path, dict]): Path to config file or dictionary containing config
-                parameters.
-        """
 
         typer.secho("Using CUDA", fg=typer.colors.GREEN) if Device() == "cuda" else typer.secho(
             "Using CPU", fg=typer.colors.RED
@@ -47,10 +38,8 @@ class Trainer:
 
         self.params = self._parse_config(
             config
-        )  # parse configuration and load into `params` namespace
-        self.writer = (
-            self._init_tensorboard()
-        )  # create `SummaryWriter` for tensorboard visualization
+        )
+
         self.wandb_writer = self._init_wandb()
 
         (
@@ -65,7 +54,6 @@ class Trainer:
 
         #if noise>0, then add some % of noise to the input self.adj. It can be random
         #dropout of edges (false negative) or random addition of edges (false positive)
-        #TODO start with false negative i.e., incomplete network
         add_noise = self.params.noise[0]
         drop_noise = self.params.noise[1]
 
@@ -105,25 +93,7 @@ class Trainer:
         cp = ConfigParser(config)
         return cp.parse()
 
-    def _init_tensorboard(self):
-        if self.params.tensorboard and (
-            self.params.tensorboard["training"] or self.params.tensorboard["embedding"]
-        ):
-            from torch.utils.tensorboard import SummaryWriter
 
-            typer.secho("Using TensorBoard logging", fg=typer.colors.GREEN)
-            log_dir = (
-                None
-                if "log_dir" not in self.params.tensorboard
-                else self.params.tensorboard["log_dir"]
-            )
-            comment = (
-                ""
-                if "comment" not in self.params.tensorboard
-                else self.params.tensorboard["comment"]
-            )
-            return SummaryWriter(log_dir=log_dir, comment=comment, flush_secs=10,)
-        return None
 
     def _init_wandb(self):
         if self.params.wandb and (self.params.wandb["training"] or self.params.wandb["validation"]):
@@ -291,29 +261,6 @@ class Trainer:
                 progress_string = self._create_progress_string(epoch, epoch_losses, time_start)
                 typer.echo(progress_string)
 
-            #NURE: plot heatmap for aggregate attention at each 250th epoch
-            # if (epoch%25)==0:
-            #     plot_agg_att_mat(agg_attn_mats, epoch, self.params.noise[0])
-
-            # Add loss data to tensorboard visualization
-            if self.writer and self.params.tensorboard["training"]:
-                recon_loss_dct = {}
-                cls_loss_dct = {}
-                project_name = self.writer.log_dir.split('/')[-1]
-                for i, loss in enumerate(epoch_losses):
-                    if self.labels is not None and i >= len(self.adj):
-                        name = self.params.label_names[i - len(self.adj)].stem
-                        cls_loss_dct[name] = loss
-                    else:
-                        name = self.params.net_names[i].stem
-                        recon_loss_dct[name] = loss
-
-                recon_loss_dct["Total"] = sum(recon_loss_dct.values())
-                cls_loss_dct["Total"] = sum(cls_loss_dct.values())
-
-                self.writer.add_scalars(f"{project_name}/Reconstruction Loss", recon_loss_dct, epoch)
-                if cls_loss_dct:
-                    self.writer.add_scalars(f"{project_name}/Classification Loss", cls_loss_dct, epoch)
 
             if self.wandb_writer and self.params.wandb["training"]:
                 recon_loss_dct = {}
@@ -353,8 +300,7 @@ class Trainer:
                 }
                 best_state = state
 
-        if self.writer:
-            self.writer.close()
+
         if self.wandb_writer:
             self.wandb_writer.unwatch()
             self.wandb_writer.finish()

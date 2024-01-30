@@ -339,14 +339,6 @@ def plot_agg_att_mat(agg_attn_mats, epoch_no, noise):
         plt.xlabel('self_attn')
         plt.ylabel('out_attn')
 
-        # plt.scatter(agg_single_head[:, 0], label='self-attn')
-        # plt.scatter(agg_single_head[:, 1], label='out-attn')
-
-        # plt.imshow(agg_single_head, aspect='auto')
-        # plt.axvline(x=0.5, color='white', linewidth=2)
-        # plt.axvline(x=1.5, color='white', linewidth=2)
-        # plt.xticks([0, 1], ['self-attn', 'out-attn'])
-
         plt.title(f'noise_{noise}_e_{epoch_no}_net_{net_no}_l_{layer_no}_head_0')
 
         plt.show()

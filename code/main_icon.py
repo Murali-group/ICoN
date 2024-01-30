@@ -1,21 +1,11 @@
-import cProfile
 import time
-import typer
-from pathlib import Path
-from utils.common import create_time_taken_string
 import sys
 import json
 from typing import Union
 from utils.common import *
 from train_icon_noise import Trainer
 
-
 def main(config_path: Union[Path, dict]):
-    """Integrates networks using BIONIC.
-      All relevant parameters for the model should be specified in a `.json` config file.
-      See https://github.com/bowang-lab/BIONIC/blob/master/README.md for details on writing
-      the config file, as well as usage tips.
-      """
     time_start = time.time()
     for run_no in range(5):
         trainer = Trainer(config_path)
