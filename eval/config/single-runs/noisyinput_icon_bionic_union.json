@@ -1,0 +1,108 @@
+{
+    "networks": [
+         {
+            "name": "Union_noise_0%",
+            "path": "datasets/yeast/Costanzo-2016_Hu-2007_Krogan-2006.txt",
+            "delimiter": " "
+        },
+       {
+            "name": "Union_noise_30%",
+            "path": "datasets/yeast/Costanzo-2016_noise-0-3_Hu-2007_noise-0-3_Krogan-2006_noise-0-3.txt",
+            "delimiter": " "
+        },
+       {
+            "name": "Union_noise_50%",
+            "path": "datasets/yeast/Costanzo-2016_noise-0-5_Hu-2007_noise-0-5_Krogan-2006_noise-0-5.txt",
+            "delimiter": " "
+        }
+    ],
+    "features": [
+
+      {
+            "name": "ICoN_noise_0%",
+            "path": "datasets/yeast/ICON/Costanzo-2016-Hu-2007-Krogan-2006/gat-68-10-3-0-4_co-attn-True_emb-512_e-3000_lr-0-0005_nbr-2_noise-0-7_0-7/run_0_features.tsv",
+            "delimiter": "\t"
+        },
+       {
+            "name": "BIONIC_noise_0%",
+            "path": "datasets/yeast/BIONIC/Costanzo-2016-Hu-2007-Krogan-2006/gat-68-10-3-0_emb-512_e-2123_lr-0-00058_nbr-2_res-True_ls-single_ft-one-hot/run_0_features.tsv",
+            "delimiter": "\t"
+        },
+
+      {
+            "name": "ICoN_noise_30%",
+            "path": "datasets/yeast/ICON/noisyinput_03_Costanzo-2016_Hu-2007_Krogan-2006/gat-68-10-3-0-4_co-attn-True_emb-512_e-3000_lr-0-0005_nbr-2_noise-0-7_0-7/run_0_features.tsv",
+            "delimiter": "\t"
+        },
+
+       {
+            "name": "BIONIC_noise_30%",
+            "path": "datasets/yeast/BIONIC/noisyinput_03_Costanzo-2016_Hu-2007_Krogan-2006/gat-68-10-3-0_emb-512_e-2123_lr-0-00058_nbr-2_res-True_ls-single_ft-one-hot/run_0_features.tsv",
+            "delimiter": "\t"
+        },
+
+      {
+            "name": "ICoN_noise_50%",
+            "path": "datasets/yeast/ICON/noisyinput_05_Costanzo-2016_Hu-2007_Krogan-2006/gat-68-10-3-0-4_co-attn-True_emb-512_e-3000_lr-0-0005_nbr-2_noise-0-7_0-7/run_0_features.tsv",
+            "delimiter": "\t"
+        },
+       {
+            "name": "BIONIC_noise_50%",
+            "path": "datasets/yeast/BIONIC/noisyinput_05_Costanzo-2016_Hu-2007_Krogan-2006/gat-68-10-3-0_emb-512_e-2123_lr-0-00058_nbr-2_res-True_ls-single_ft-one-hot/run_0_features.tsv",
+            "delimiter": "\t"
+        }
+    ],
+    "standards": [
+      {
+            "name": "IntAct",
+            "task": "module_detection",
+            "path": "standards/module-detection/yeast-IntAct-complex-modules.json",
+            "samples": 10,
+            "methods": [
+                "average",
+                "single",
+                "complete"
+            ],
+            "metrics": [
+                "euclidean",
+                "cosine"
+            ],
+            "thresholds": 500
+        },
+
+      {
+            "name": "GO",
+            "task": "module_detection",
+            "path": "standards/module-detection/yeast-GO-bioprocess-modules.json",
+            "samples": 10,
+            "methods": [
+                "average",
+                "single",
+                "complete"
+            ],
+            "metrics": [
+                "euclidean",
+                "cosine"
+            ],
+            "thresholds": 500
+        },
+      {
+            "name": "KEGG",
+            "task": "module_detection",
+            "path": "standards/module-detection/yeast-KEGG-pathway-modules.json",
+            "samples": 10,
+            "methods": [
+                "average",
+                "single",
+                "complete"
+            ],
+            "metrics": [
+                "euclidean",
+                "cosine"
+            ],
+            "thresholds": 500
+        }
+
+    ],
+    "consolidation": "union"
+}

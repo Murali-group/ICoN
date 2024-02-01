@@ -1,0 +1,73 @@
+{
+    "networks": [
+        {
+            "name": "Hein-15",
+            "path": "datasets/human/Hein-2015.txt",
+            "delimiter": " "
+        },
+        {
+            "name": "Huttlin-15",
+            "path": "datasets/human/Huttlin-2015.txt",
+            "delimiter": " "
+        },
+        {
+            "name": "Huttlin-17",
+            "path": "datasets/human/Huttlin-2017.txt",
+            "delimiter": " "
+        },
+        {
+            "name": "Rolland-14",
+            "path": "datasets/human/Rolland-2014.txt",
+            "delimiter": " "
+        },
+       {
+            "name": "Union",
+            "path": "datasets/human/Hein-2015_Huttlin-2015_Huttlin-2017_Rolland-2014.txt",
+            "delimiter": " "
+        }
+
+    ],
+    "features": [
+      {
+            "name": "ICoN",
+            "path": "datasets/human/ICON/Hein-2015-Huttlin-2015-Huttlin-2017-Rolland-2014/gat-68-10-3-0-4_co-attn-True_emb-512_e-5_lr-0-0005_nbr-2_noise-0-7_0-7/run_0_features.tsv",
+            "delimiter": "\t"
+        },
+
+      {
+            "name": "BIONIC",
+            "path": "datasets/human/BIONIC/Hein-2015-Huttlin-2015-Huttlin-2017-Rolland-2014/gat-68-10-3_emb-512_e-3000_lr-0-00058_nbr-2_res-True_ls-single_ft-one-hot/run_0_features.tsv",
+            "delimiter": "\t"
+        },
+      {
+            "name": "BERTWalk",
+            "path": "datasets/human/BERTWalk/run_0_features.tsv",
+            "delimiter": "\t"
+        },
+
+      {
+            "name": "deepNF",
+            "path": "datasets/human/deepNF/Rolland-2014_Hein-2015_Huttlin-2015_Huttlin-2017/MDA_arch_1425-512-1425_lr_0.0081_nf_0.552_e_4372/run_0_features.tsv",
+            "delimiter": "\t"
+        },
+
+       {
+            "name": "Mashup",
+            "path": "datasets/human/Mashup/Hein-2015_Huttlin-2015_Huttlin-2017_Rolland-2014/dim_512/run_0_features.tsv",
+            "delimiter": "\t"
+        }
+
+
+    ],
+    "standards": [
+        {
+            "name": "CORUM",
+            "task": "coannotation",
+            "path": "standards/coannotation-prediction/human-CORUM-complex-coannotation.csv",
+            "delimiter": ","
+        }
+
+
+    ],
+    "consolidation": "union"
+}
