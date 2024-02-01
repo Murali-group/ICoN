@@ -1,7 +1,7 @@
 import pandas as pd
 import seaborn as sns
 from script.paper_plots import plot_bars
-
+import sys
 
 
 #********************************** PLOT Utils******************************************
@@ -38,8 +38,8 @@ def wrapper_plot_ablation(ablation_df, metric, task,model_name_mapping, out_dir)
 
 
 
-def main():
-    input_dir = '/home/grads/tasnina/Submission_Projects/BIONIC-evals/bioniceval/results/'
+def main(input_dir):
+    # input_dir = '/home/grads/tasnina/Submission_Projects/BIONIC-evals/bioniceval/results/'
     model_name_mapping = {'without noise__run0':'without noise', 'with noise__run0':'with noise' }
 
     ##************ Ablation study on module detection files******************
@@ -58,9 +58,6 @@ def main():
     func_df = pd.read_csv(func_file, sep='\t')[['Standard', 'Dataset', metric]]
     wrapper_plot_ablation(func_df, metric, task,model_name_mapping, input_dir)
 
-
-
-
     #ablation study for coannotation pred
     task = 'Co-annotation Prediction'
     metric = 'Average Precision'
@@ -68,11 +65,8 @@ def main():
     coann_df = pd.read_csv(coann_file, sep='\t')[['Standard', 'Dataset', metric]]
     wrapper_plot_ablation(coann_df, metric, task, model_name_mapping, input_dir)
 
-
-
-
-
     print('done')
 
 if __name__=='__main__':
-    main()
+    input_dir = sys.argv[1]
+    main(input_dir)

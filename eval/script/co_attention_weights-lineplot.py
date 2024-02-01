@@ -3,8 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from scipy.special import softmax
+import sys
 
 net_name_mapping = {'Costanzo-2016.txt': 'GI Network', 'Hu-2007.txt':'COEX Network', 'Krogan-2006.txt': 'PPI Network'}
+
 def parse_netscale_file(net_scale_file, noise):
     with open(net_scale_file,'r') as file:
         file_content = file.read()
@@ -43,9 +45,10 @@ def parse_netscale_file(net_scale_file, noise):
     return dataframes, ordered_dataset_name
 
 
-def main():
-    input_dir = '/home/grads/tasnina/Submission_Projects/BIONIC-evals/bioniceval/datasets/yeast/ICON/Costanzo-2016-Hu-2007-Krogan-2006/'
-    output_dir = '/home/grads/tasnina/Submission_Projects/BIONIC-evals/bioniceval/results/attention_weights/'
+def main(input_dir):
+    # input_dir = '/home/grads/tasnina/Submission_Projects/BIONIC-evals/bioniceval/datasets/yeast/ICON/Costanzo-2016-Hu-2007-Krogan-2006/'
+    input_dir = input_dir + '/yeast/ICON/Costanzo-2016-Hu-2007-Krogan-2006/'
+    output_dir = input_dir + '/attention_weights/'
 
     noises = [[0, 0],[0.1, 0.1], [0.3, 0.3], [0.5, 0.5]]
     parsed_weights_dict= {key:pd.DataFrame() for key in str(noises)}
@@ -127,4 +130,5 @@ def main():
 
 
 if __name__=='__main__':
-    main()
+    input_dir = sys.argv[1]
+    main(input_dir)
