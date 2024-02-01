@@ -1,6 +1,6 @@
 To evaluate ICoN in terms of downstream tasks: i. gene module detection, ii.gene coannotation prediction, and  iii. gene function prediction we utilized [BIONIC-evals](https://github.com/duncster94/BIONIC-evals).
 
-We have provided the [datasets](https://github.com/Murali-group/ICoN/tree/main/eval/datasets/), standards, [config](https://github.com/Murali-group/ICoN/tree/main/eval/config/), and script used in creating figured in the manuscript of ICoN. To reproduce these figures follow the instructions below:
+We have provided the [datasets](https://github.com/Murali-group/ICoN/tree/main/eval/datasets/), standards, [config](https://github.com/Murali-group/ICoN/tree/main/eval/config/), and [script](https://github.com/Murali-group/ICoN/tree/main/eval/script) used in creating figured in the manuscript of ICoN. To reproduce these figures follow the instructions below:
 1. First install BIONIC-evals following the instructions given here in [BIONIC-evals](https://github.com/duncster94/BIONIC-evals)
 2. Place our provided <script> folder in <BIONIC-evals/bioniceval> folder. 
 3. Now in the <BIONIC-evals/bioniceval> folder in your machine, replace the following folders with our provided folders [here](https://github.com/Murali-group/ICoN/tree/main/eval) under the same name:
@@ -8,7 +8,36 @@ We have provided the [datasets](https://github.com/Murali-group/ICoN/tree/main/e
    ii. config
    iii. standards
 
-## Comparative analysis between ICoN and other network integration models:
+## i. Comparative analysis between ICoN and other network integration models (and input networks):
+1. Run BIONIC-evals with config <config/single_runs/yeast.json>
+2. Then run:
+   ```
+   python paper_plots.py <bionic_eval_results_folder>
+   ```
 
+## ii. Ablation study of ICoN:
+### Co-attention
+1. Run BIONIC-evals with config <config/single_runs/ablation_nocoattn.json>
+2. Then run:
+   ```
+   python ablation_study_coattn.py <bionic_eval_results_folder>
+   ```
+### Noise induction module
+1. Run BIONIC-evals with config <config/single_runs/ablation_nonoise.json>
+2. Then run:
+   ```
+   python ablation_study_noise.py <bionic_eval_results_folder>
+   ```
 
-    
+## iii. Co-attention coeffcient:
+Run:
+   ```
+   python co_attention_weights-lineplot.py <bionic_eval_datasets_folder>
+   ```
+
+## iv. Robustness to noise:
+1. Run BIONIC-evals with config <config/single_runs/noisyinput_icon_bionic_union.json>
+2. Then run:
+   ```
+   python noise_robustness.py <bionic_eval_results_folder>
+   ```
