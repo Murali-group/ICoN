@@ -1,6 +1,3 @@
-import copy
-import time
-
 import warnings
 import torch.nn as nn
 import torch.nn.functional as F
@@ -11,7 +8,6 @@ from .layers import ComboWGATConv,  Interp, NetWeights
 from .model_utils import *
 
 class IconCombo(nn.Module):
-    # def __init__(self, in_size: int,  net_idx:int, n_modalities:int, gat_shapes: Dict[str, int], alpha: float = 0.1):
     def __init__(self, in_size: int, gat_shapes: Dict[str, int], alpha: float = 0.1,
             net_weights =None, dropout=None):
 
@@ -103,11 +99,9 @@ class Icon(nn.Module):
         emb_size: int,
         residual: False,
         n_modalities: int,
-        bionic_mask: bool=True,
         alpha: float = 0.1,
         svd_dim: int = 0,
         shared_encoder: bool = False,
-        n_classes: Optional[List[int]] = None,
         feats=None,
         init_mode='max_own',
         agg = 'avg',
@@ -138,11 +132,8 @@ class Icon(nn.Module):
         self.residual = residual
         self.alpha = alpha
         self.n_modalities = n_modalities
-        # self.bionic_mask = bionic_mask
         self.svd_dim = svd_dim
         self.shared_encoder = shared_encoder
-        self.n_classes = n_classes
-
         self.pre_gat_type = pre_gat_type
         self.gat_type = gat_type
         self.scale = scale
@@ -195,21 +186,6 @@ class Icon(nn.Module):
         # Embedding
         self.emb = nn.Linear(self.integration_size, self.emb_size)
 
-        # Supervised classification head
-        if self.n_classes:
-            self.cls_heads = [
-                nn.Sequential(
-                    nn.Linear(self.emb_size, self.emb_size),  # improves optimization
-                    nn.Linear(self.emb_size, n_classes_),
-                )
-                for n_classes_ in self.n_classes
-            ]
-            for h, cls_head in enumerate(self.cls_heads):
-                self.add_module(f"Classification_Head_{h}", cls_head)
-        else:
-            self.cls_heads = None
-
-
     def set_encoder(self):
         # Initiate the net_scales
         net_weights = {}
@@ -237,7 +213,7 @@ class Icon(nn.Module):
                     net_weights[0][i] if i in net_weights[0] else net_weights[0][0]))
                 self.add_module(f"Co_Encoder_{i}_0", self.encoders[i][0])
 
-        #TODO Work on an encoder where across all networks for a certain layer only one w is trained.
+        #An encoder where across all networks for a certain layer only one w is trained.
         elif self.gat_type == 'abs_single':
             for k in range(self.n_layers):
                 #initialize dropout=0 as I will use dropout even before calling the self.gat.forward() for this param setup
@@ -266,8 +242,8 @@ class Icon(nn.Module):
 
     def forward(
         self,
-        data_flows: List[Tuple[int, Tensor, List[Adj]]],
-        masks: Tensor,
+        data_flows: List[Tuple[int, torch.Tensor, List[Adj]]],
+        masks: torch.Tensor,
         evaluate: bool = False,
         rand_net_idxs: Optional[np.ndarray] = None,
     ):
@@ -391,12 +367,6 @@ class Icon(nn.Module):
         # Dot product (network reconstruction)
         dot = torch.mm(emb, torch.t(emb))
 
-        # Classification (if standards are provided)
-        if self.cls_heads:
-            classes = [head(emb) for head in self.cls_heads]
-        else:
-            classes = None
-
-        return dot, emb, None, net_scales, classes, sum_diff, diffs, norm_diffs, sum_norm_diff, agg_attn_mats
+        return dot, emb, None, net_scales, sum_diff, diffs, norm_diffs, sum_norm_diff, agg_attn_mats
 
 

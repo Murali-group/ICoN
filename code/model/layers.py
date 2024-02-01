@@ -14,7 +14,6 @@ from typing import Optional, Tuple
 from torch_geometric.typing import OptTensor
 from torch_geometric.utils import add_self_loops, remove_self_loops
 from torch_sparse import SparseTensor, set_diag
-from torch_geometric.typing import Adj, Size
 
 
 def weighted_softmax(
@@ -24,7 +23,31 @@ def weighted_softmax(
     ptr: Optional[Tensor] = None,
     num_nodes: Optional[int] = None,
 ) -> Tensor:
-    """Extends the PyTorch Geometric `softmax` functionality to incorporate edge weights.
+    """
+    MIT License
+
+    Copyright (c) 2020 Duncan Forster
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+
+    Extends the PyTorch Geometric `softmax` functionality to incorporate edge weights.
 
     See the PyTorch Geomtric `softmax` documentation for details on arguments.
     """
@@ -168,7 +191,30 @@ class ComboWGATConv(GATConv):
         return x_j * alpha.unsqueeze(-1)
 
 class Interp(nn.Module):
-    """Stochastic summation layer.
+    """
+    MIT License
+
+    Copyright (c) 2020 Duncan Forster
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+    Stochastic summation layer.
 
     Performs random node feature dropout and feature scaling.
     NOTE: This is not very nice, but it is differentiable. Future work

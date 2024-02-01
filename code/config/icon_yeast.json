@@ -1,0 +1,22 @@
+{
+  "net_names": [
+    "/home/grads/tasnina/Submission_Projects/ICoN/inputs/Costanzo-2016.txt",
+    "/home/grads/tasnina/Submission_Projects/ICoN/inputs/Hu-2007.txt",
+    "/home/grads/tasnina/Submission_Projects/ICoN/inputs/Krogan-2006.txt"
+  ],
+  "out_name": "/home/grads/tasnina/Submission_Projects/ICoN/outputs/yeast_gi_coex_ppi",
+  "epochs":5000,
+  "batch_size": 2048,
+  "learning_rate": 0.0005,
+  "embedding_size": 512,
+  "gat_shapes": {
+    "dimension": 68,
+    "n_heads": 10,
+    "n_layers": 3,
+    "dropout": 0.4,
+    "decay": 0
+  },
+  "con": true,
+  "neighbor_sample_size": [2],
+  "noise": [[0.7,0.7]]
+}

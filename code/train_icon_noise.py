@@ -1,6 +1,4 @@
-import json
-import os
-import pathlib
+
 import time
 import math
 import warnings
@@ -8,24 +6,15 @@ from pathlib import Path
 from typing import Union, List, Optional
 import re
 import typer
-import numpy as np
 import pandas as pd
-import torch
 import torch.optim as optim
 import torch.multiprocessing
-import matplotlib.pyplot as plt
-
 from utils.config_parser import ConfigParser
 from utils.plotter import plot_losses, save_losses
 from utils.preprocessor import Preprocessor
 from utils.sampler import StatefulSampler, NeighborSamplerWithWeights
 from utils.common import extend_path, cyan, magenta, Device
-#TODO uncomment later
-
-
-# from model.model_icon_with_bionic_mode import Icon, IconParallel
-
-from model.loss import masked_scaled_mse, classification_loss
+from model.loss import masked_scaled_mse
 from model.model_utils import  *
 
 
@@ -163,10 +152,8 @@ class Trainer:
             self.params.embedding_size,
             self.params.residual,
             len(self.adj),
-            self.params.bmask,
             svd_dim=self.params.svd_dim,
             shared_encoder=self.params.shared_encoder,
-            n_classes=n_classes,
             feats = self.feat if self.params.feat_type=='adj' else None,
             init_mode=self.params.init_mode,
             agg = self.params.agg,
@@ -248,9 +235,7 @@ class Trainer:
                         epoch_losses[len(rand_idxs) + idx] = loss
 
             else:
-                t1=time.time()
                 _, losses, sum_diff, diffs, norm_diffs, sum_norm_diff, agg_attn_mats = self._train_step()
-                # print('timestep: ',time.time()-t1 )
 
                 epoch_losses = [
                     ep_loss + b_loss.item() / (len(self.index) / self.params.batch_size)
@@ -332,65 +317,33 @@ class Trainer:
 
         for batch_masks, node_ids in zip(mask_splits, int_splits):
             #NURE: incorporate batches to accommodate independent GAT layers
-            data_flows = batch_sampling(batch_loaders, node_ids, self.params.gat_shapes["n_layers"] +
-                                        self.params.gat_shapes["free_layers"] )
+            data_flows = batch_sampling(batch_loaders, node_ids, self.params.gat_shapes["n_layers"])
 
             t2=time.time()
             # print('batching: ', t2-t1)
             # print('Done batching')
             #************************
             self.optimizer.zero_grad()
-            # Subset supervised labels and masks if provided
-            if self.labels is not None:
-                batch_labels = [labels[node_ids, :] for labels in self.labels]
-                batch_labels_masks = [label_masks[node_ids] for label_masks in self.label_masks]
 
-            if bool(self.params.sample_size):
-                output, _, _, _, label_preds, sum_diff, diffs, norm_diffs, sum_norm_diff = self.model(
-                    data_flows, batch_masks, rand_net_idxs=rand_net_idx,)
-                recon_losses = [
-                    masked_scaled_mse(
-                        output,
-                        self.adj[i],
-                        self.weights[i],
-                        node_ids,
-                        batch_masks[:, j],
-                        self.params.lambda_,
-                        device="cuda:0" if self.params.model_parallel else None,
-                    )
-                    for j, i in enumerate(rand_net_idx)
-                ]
-            else: #ICON runs this
-                output, _, net_spec_outputs, _, label_preds, sum_diff, diffs, norm_diffs, sum_norm_diff, agg_attn_mats = self.model(data_flows, batch_masks)
-                recon_losses = [
-                    masked_scaled_mse(
-                        output,
-                        self.adj[i],
-                        self.weights[i],
-                        node_ids,
-                        batch_masks[:, i],
-                        self.params.lambda_,
-                        device="cuda:0" if self.params.model_parallel else None,
-                        loss_type = self.params.loss_type,
-                        bmask = self.params.bmask,
-                        spec_recons = net_spec_outputs[i] if net_spec_outputs is not None else None
-                    )
-                    for i in range(len(self.adj))
-                ]
 
-            if label_preds is not None:
-                cls_losses = [
-                    classification_loss(pred, label, label_mask, self.params.lambda_)
-                    for pred, label, label_mask in zip(
-                        label_preds, batch_labels, batch_labels_masks
-                    )
-                ]
-                curr_losses = recon_losses + cls_losses
-                losses = [loss + curr_loss for loss, curr_loss in zip(losses, curr_losses)]
-                loss_sum = sum(curr_losses)
-            else:
-                losses = [loss + curr_loss for loss, curr_loss in zip(losses, recon_losses)]
-                loss_sum = sum(recon_losses)
+            output, _, net_spec_outputs, _, sum_diff, diffs, norm_diffs, sum_norm_diff, agg_attn_mats = \
+                self.model(data_flows, batch_masks)
+            recon_losses = [
+                masked_scaled_mse(
+                    output,
+                    self.adj[i],
+                    self.weights[i],
+                    node_ids,
+                    self.params.lambda_,
+                    device="cuda:0" if self.params.model_parallel else None,
+                    spec_recons = net_spec_outputs[i] if net_spec_outputs is not None else None
+                )
+                for i in range(len(self.adj))
+            ]
+
+
+            losses = [loss + curr_loss for loss, curr_loss in zip(losses, recon_losses)]
+            loss_sum = sum(recon_losses)
 
             loss_sum.backward()
             self.optimizer.step()
@@ -438,26 +391,16 @@ class Trainer:
                 '-'+str(self.params.gat_shapes['dimension'])+\
                 '-'+str(self.params.gat_shapes['n_heads'])+\
                 '-' + str(self.params.gat_shapes['n_layers'])+ \
-                '-'+str(self.params.gat_shapes['dropout'])+\
-                '-'+str(self.params.gat_shapes['decay'])+ \
-                '-' + str(self.params.gat_shapes['free_layers'])+\
-                '-'+self.params.gat_type +\
-                '-'+self.params.scale
-        gat_str =  gat_str + (f'-{self.params.con}' if not (self.params.con) else '')
-
+                '-'+str(self.params.gat_shapes['dropout']).replace('.','-')
         # Nure: Whenever a new parameter is considered, add it here.
         # Rest of the parameters
-        other_tracked_parameters = {'emb': str(self.params.embedding_size),
+        other_tracked_parameters = {
+                'co-attn': str(self.params.con),
+                'emb': str(self.params.embedding_size),
                 'e': str(self.params.epochs),
                 'lr': str(self.params.learning_rate).replace('.','-'),
                 'nbr': str(self.params.neighbor_sample_size),
-                'pgat': self.params.pre_gat_type, 'res':str(self.params.residual),
-                'ls':self.params.loss_type,
-                'ft': self.params.feat_type+('-0' if not self.params.bmask else '')
-                                    +('-norm' if self.params.norm_adj else ''),
-                'init': self.params.init_mode,
-                'agg': str(self.params.agg),
-                'noise': str(self.params.noise)}
+                'noise': ('_'.join(str(i) for i in self.params.noise)).replace('.','-') }
 
         other_param_str = ''
         for key in other_tracked_parameters:
@@ -470,7 +413,7 @@ class Trainer:
         return  file_prefix
 
     def forward(self, run_no, verbosity: int = 1):
-        """Runs the forward pass on the trained BIONIC model.
+        """Runs the forward pass on the trained ICON model.
         Args:
 
             verbosity (int): 0 to supress printing (except for progress bar), 1 for regular printing.
@@ -541,14 +484,10 @@ class Trainer:
         count=0
         for mask in self.masks:
             data_flows = batch_sampling(self.inference_loaders,[count],
-                        self.params.gat_shapes["n_layers"]+ self.params.gat_shapes["free_layers"])
+                        self.params.gat_shapes["n_layers"])
             mask = mask.reshape((1, -1))
-            _, emb, _, learned_scales, label_preds, sum_diff, diff, _, sum_norm_diff,_ = self.model(data_flows, mask, evaluate=True)
+            _, emb, _, learned_scales, sum_diff, diff, _, sum_norm_diff,_ = self.model(data_flows, mask, evaluate=True)
             emb_list.append(emb.detach().cpu().numpy())
-
-            if label_preds is not None:
-                for i, pred in enumerate(label_preds):
-                    prediction_lists[i].append(torch.sigmoid(pred).detach().cpu().numpy())
             count+=1
 
         emb = np.concatenate(emb_list)
@@ -623,3 +562,6 @@ class Trainer:
                     )
 
         typer.echo(magenta("Complete!"))
+
+
+
