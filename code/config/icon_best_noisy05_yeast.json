@@ -5,7 +5,7 @@
     "/home/grads/tasnina/Submission_Projects/ICoN/inputs/Krogan-2006_noise-0-5.txt"
   ],
   "out_name": "/home/grads/tasnina/Submission_Projects/ICoN/outputs/yeast_gi_coex_ppi",
-  "epochs":5000,
+  "epochs":3000,
   "batch_size": 2048,
   "learning_rate": 0.0005,
   "embedding_size": 512,
