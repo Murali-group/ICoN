@@ -2,8 +2,8 @@
 Integration using Co-attention across biological Networks
 
 ## Generate protein embedding
-1. To set up the environment, run the commands in [icon_env.txt](https://github.com/Murali-group/ICoN/blob/main/icon_env.txt) file.
-2. To run ICoN with the best hyperparamters on yeast networks, run (inside [code](https://github.com/Murali-group/ICoN/tree/main/code) folder)
+1. To set up the environment, run the commands in icon_env.txt file.
+2. To run ICoN with the best hyperparamters on yeast networks, run (inside code folder)
     ```
    python main_icon.py config/icon_best_yeast.json
    ```
