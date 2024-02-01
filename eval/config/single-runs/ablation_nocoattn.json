@@ -1,0 +1,142 @@
+{
+  "networks": [],
+    "features": [
+
+      {
+            "name": "without co-attn",
+            "path": "datasets/yeast/ICON/yeast_gi_coex_ppi/Costanzo-2016-Hu-2007-Krogan-2006/gat-68-10-3-0-4_co-attn-False_emb-512_e-3000_lr-0-0005_nbr-2_noise-0-7_0-7/run_0_features.tsv",
+            "delimiter": "\t"
+        },
+       {
+            "name": "with co-attn",
+            "path": "datasets/yeast/ICON/yeast_gi_coex_ppi/Costanzo-2016-Hu-2007-Krogan-2006/gat-68-10-3-0-4_co-attn-True_emb-512_e-3000_lr-0-0005_nbr-2_noise-0-7_0-7/run_0_features.tsv",
+            "delimiter": "\t"
+        }
+    ],
+    "standards": [
+       {
+            "name": "IntAct",
+            "task": "coannotation",
+            "path": "standards/coannotation-prediction/yeast-IntAct-complex-coannotation.csv",
+            "delimiter": ","
+        },
+        {
+            "name": "GO",
+            "task": "coannotation",
+            "path": "standards/coannotation-prediction/yeast-GO-bioprocess-coannotation.csv",
+            "delimiter": ","
+        },
+      {
+            "name": "KEGG",
+            "task": "coannotation",
+            "path": "standards/coannotation-prediction/yeast-KEGG-pathway-coannotation.csv",
+            "delimiter": ","
+        },
+       {
+            "name": "IntAct",
+            "task": "function_prediction",
+            "path": "standards/function-prediction/yeast-IntAct-complex-labels.json",
+            "test_size": 0.1,
+            "folds": 5,
+            "trials": 5,
+            "gamma": {
+                "minimum": 1e-6,
+                "maximum": 1e-1,
+                "samples": 10
+            },
+            "regularization": {
+                "minimum": 1e-3,
+                "maximum": 1e4,
+                "samples": 30
+            }
+        },
+        {
+            "name": "GO",
+            "task": "function_prediction",
+            "path": "standards/function-prediction/yeast-GO-bioprocess-labels.json",
+            "test_size": 0.1,
+            "folds": 5,
+            "trials": 5,
+            "gamma": {
+                "minimum": 1e-6,
+                "maximum": 1e-1,
+                "samples": 10
+            },
+            "regularization": {
+                "minimum": 1e-3,
+                "maximum": 1e4,
+                "samples": 30
+            }
+        },
+
+       {
+            "name": "KEGG",
+            "task": "function_prediction",
+            "path": "standards/function-prediction/yeast-KEGG-pathway-labels.json",
+            "test_size": 0.1,
+            "folds": 5,
+            "trials": 5,
+            "gamma": {
+                "minimum": 1e-6,
+                "maximum": 1e-1,
+                "samples": 10
+            },
+            "regularization": {
+                "minimum": 1e-3,
+                "maximum": 1e4,
+                "samples": 30
+            }
+        },
+      {
+            "name": "IntAct",
+            "task": "module_detection",
+            "path": "standards/module-detection/yeast-IntAct-complex-modules.json",
+            "samples": 10,
+            "methods": [
+                "average",
+                "single",
+                "complete"
+            ],
+            "metrics": [
+                "euclidean",
+                "cosine"
+            ],
+            "thresholds": 500
+        },
+
+      {
+            "name": "GO",
+            "task": "module_detection",
+            "path": "standards/module-detection/yeast-GO-bioprocess-modules.json",
+            "samples": 10,
+            "methods": [
+                "average",
+                "single",
+                "complete"
+            ],
+            "metrics": [
+                "euclidean",
+                "cosine"
+            ],
+            "thresholds": 500
+        },
+      {
+            "name": "KEGG",
+            "task": "module_detection",
+            "path": "standards/module-detection/yeast-KEGG-pathway-modules.json",
+            "samples": 10,
+            "methods": [
+                "average",
+                "single",
+                "complete"
+            ],
+            "metrics": [
+                "euclidean",
+                "cosine"
+            ],
+            "thresholds": 500
+        }
+
+    ],
+    "consolidation": "union"
+}

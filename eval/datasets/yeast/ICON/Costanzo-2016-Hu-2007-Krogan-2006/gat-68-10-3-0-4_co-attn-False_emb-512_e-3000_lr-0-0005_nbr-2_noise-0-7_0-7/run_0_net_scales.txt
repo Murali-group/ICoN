@@ -1,0 +1,13 @@
+Costanzo-2016.txt Hu-2007.txt Krogan-2006.txt
+Costanzo-2016.txt
+layer_0	[1.0, 0.0, 0.0]
+layer_1	[1.0, 0.0, 0.0]
+layer_2	[1.0, 0.0, 0.0]
+Hu-2007.txt
+layer_0	[0.0, 1.0, 0.0]
+layer_1	[0.0, 1.0, 0.0]
+layer_2	[0.0, 1.0, 0.0]
+Krogan-2006.txt
+layer_0	[0.0, 0.0, 1.0]
+layer_1	[0.0, 0.0, 1.0]
+layer_2	[0.0, 0.0, 1.0]

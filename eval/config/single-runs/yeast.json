@@ -1,0 +1,183 @@
+{
+    "networks": [
+        {
+            "name": "PPI Network",
+            "path": "datasets/yeast/Krogan-2006.txt",
+            "delimiter": " "
+        },
+        {
+            "name": "COEX Network",
+            "path": "datasets/yeast/Hu-2007.txt",
+            "delimiter": " "
+        },
+        {
+            "name": "GI Network",
+            "path": "datasets/yeast/Costanzo-2016.txt",
+            "delimiter": " "
+        },
+      {
+            "name": "Union",
+            "path": "datasets/yeast/Costanzo-2016_Hu-2007_Krogan-2006.txt",
+            "delimiter": " "
+        }
+    ],
+    "features": [
+
+      {
+            "name": "ICoN",
+            "path": "datasets/yeast/ICON/Costanzo-2016-Hu-2007-Krogan-2006/gat-68-10-3-0-4_co-attn-True_emb-512_e-3000_lr-0-0005_nbr-2_noise-0-7_0-7/run_0_features.tsv",
+            "delimiter": "\t"
+        },
+
+      {
+            "name": "BIONIC",
+            "path": "datasets/yeast/BIONIC/Costanzo-2016-Hu-2007-Krogan-2006/gat-68-10-3_emb-512_e-2123_lr-0-00058_nbr-2_res-True_ls-single_ft-one-hot/run_0_features.tsv",
+            "delimiter": "\t"
+        },
+
+      {
+            "name": "BERTWalk",
+            "path": "datasets/yeast/BERTWalk/Costanzo-2016-Hu-2007-Krogan-2006/run_0_features.tsv",
+            "delimiter": "\t"
+      },
+      {
+            "name": "deepNF",
+            "path": "datasets/yeast/deepNF/Costanzo-2016-Hu-2007-Krogan-2006/MDA_arch_1425-512-1425_lr_0.0081_nf_0.552_e_4372/run_0_features.tsv",
+            "delimiter": "\t"
+        },
+       {
+            "name": "Mashup",
+            "path": "datasets/yeast/Mashup/Costanzo-2016-Hu-2007-Krogan-2006/dim_512/run_0_features.tsv",
+            "delimiter": "\t"
+        }
+    ],
+    "standards": [
+
+       {
+            "name": "IntAct",
+            "task": "coannotation",
+            "path": "standards/coannotation-prediction/yeast-IntAct-complex-coannotation.csv",
+            "delimiter": ","
+        },
+        {
+            "name": "GO",
+            "task": "coannotation",
+            "path": "standards/coannotation-prediction/yeast-GO-bioprocess-coannotation.csv",
+            "delimiter": ","
+        },
+      {
+            "name": "KEGG",
+            "task": "coannotation",
+            "path": "standards/coannotation-prediction/yeast-KEGG-pathway-coannotation.csv",
+            "delimiter": ","
+        },
+
+         {
+            "name": "IntAct",
+            "task": "function_prediction",
+            "path": "standards/function-prediction/yeast-IntAct-complex-labels.json",
+            "test_size": 0.1,
+            "folds": 5,
+            "trials": 5,
+            "gamma": {
+                "minimum": 1e-6,
+                "maximum": 1e-1,
+                "samples": 10
+            },
+            "regularization": {
+                "minimum": 1e-3,
+                "maximum": 1e4,
+                "samples": 30
+            }
+        },
+        {
+            "name": "GO",
+            "task": "function_prediction",
+            "path": "standards/function-prediction/yeast-GO-bioprocess-labels.json",
+            "test_size": 0.1,
+            "folds": 5,
+            "trials": 5,
+            "gamma": {
+                "minimum": 1e-6,
+                "maximum": 1e-1,
+                "samples": 10
+            },
+            "regularization": {
+                "minimum": 1e-3,
+                "maximum": 1e4,
+                "samples": 30
+            }
+        },
+
+       {
+            "name": "KEGG",
+            "task": "function_prediction",
+            "path": "standards/function-prediction/yeast-KEGG-pathway-labels.json",
+            "test_size": 0.1,
+            "folds": 5,
+            "trials": 5,
+            "gamma": {
+                "minimum": 1e-6,
+                "maximum": 1e-1,
+                "samples": 10
+            },
+            "regularization": {
+                "minimum": 1e-3,
+                "maximum": 1e4,
+                "samples": 30
+            }
+        },
+
+            {
+            "name": "IntAct",
+            "task": "module_detection",
+            "path": "standards/module-detection/yeast-IntAct-complex-modules.json",
+            "samples": 10,
+            "methods": [
+                "average",
+                "single",
+                "complete"
+            ],
+            "metrics": [
+                "euclidean",
+                "cosine"
+            ],
+            "thresholds": 500
+        },
+
+      {
+            "name": "GO",
+            "task": "module_detection",
+            "path": "standards/module-detection/yeast-GO-bioprocess-modules.json",
+            "samples": 10,
+            "methods": [
+                "average",
+                "single",
+                "complete"
+            ],
+            "metrics": [
+                "euclidean",
+                "cosine"
+            ],
+            "thresholds": 500
+        },
+      {
+            "name": "KEGG",
+            "task": "module_detection",
+            "path": "standards/module-detection/yeast-KEGG-pathway-modules.json",
+            "samples": 10,
+            "methods": [
+                "average",
+                "single",
+                "complete"
+            ],
+            "metrics": [
+                "euclidean",
+                "cosine"
+            ],
+            "thresholds": 500
+        }
+
+    ],
+    "consolidation": "union"
+}
