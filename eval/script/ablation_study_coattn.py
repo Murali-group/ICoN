@@ -1,7 +1,7 @@
 import pandas as pd
 import seaborn as sns
 from script.paper_plots import plot_bars
-
+import sys
 
 
 #********************************** PLOT Utils******************************************
@@ -39,8 +39,8 @@ def wrapper_plot_ablation(ablation_df, metric, task,model_name_mapping, out_dir)
 
 
 
-def main():
-    input_dir = '/home/grads/tasnina/Submission_Projects/BIONIC-evals/bioniceval/results/'
+def main(input_dir):
+    # input_dir = '/home/grads/tasnina/Submission_Projects/BIONIC-evals/bioniceval/results/'
     model_name_mapping = {'without coattn__run0':'without coattn', 'with coattn__run0':'with coattn' }
 
     ##************ Ablation study on module detection files******************
@@ -76,4 +76,5 @@ def main():
     print('done')
 
 if __name__=='__main__':
-    main()
+    input_dir = sys.argv[1]
+    main(input_dir)

@@ -1,7 +1,7 @@
 import pandas as pd
 import seaborn as sns
 from script.paper_plots import plot_bars
-
+import sys
 
 #********************************** PLOT Utils******************************************
 
@@ -40,8 +40,8 @@ def compute_relative_score_drop(diff_noise_df, metric ='Module Match Score (AMI)
     relative_df = pd.DataFrame({'noise':noises, 'Dataset_name':models, 'Relative AMI': amis})
     return relative_df
 
-def main():
-    input_dir = '/home/grads/tasnina/Submission_Projects/BIONIC-evals/bioniceval/results/'
+def main(input_dir):
+    # input_dir = '/home/grads/tasnina/Submission_Projects/BIONIC-evals/bioniceval/results/'
     out_dir = input_dir+'noisyinput/module_detection/'
     ##************ module detection files
     noise_file=input_dir+ 'noisyinput_icon_bionic_union_module_detection.tsv'
@@ -82,4 +82,5 @@ def main():
     print('done')
 
 if __name__=='__main__':
-    main()
+    input_dir = sys.argv[1]
+    main(input_dir)

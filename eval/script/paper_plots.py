@@ -2,7 +2,7 @@ from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import sys
 #********************************** PLOT Utils******************************************
 PALETTE = sns.cubehelix_palette(start=0.3, hue=1,
             gamma=0.4,dark=0.1, light=0.9,
@@ -173,11 +173,11 @@ def plot_for_human(input_dir):
     wrapper_plot_coann(coannotation_file, models, networks, order, input_dir)
 
 
-def main():
-    input_dir = '/home/grads/tasnina/Submission_Projects/BIONIC-evals/bioniceval/results/'
-
+def main(input_dir):
+    # input_dir = '/home/grads/tasnina/Submission_Projects/BIONIC-evals/bioniceval/results/'
     plot_for_yeast(input_dir)
     plot_for_human(input_dir)
 
 if __name__=='__main__':
-    main()
+    input_dir = sys.argv[1]
+    main(input_dir)
