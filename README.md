@@ -7,7 +7,7 @@ Integration using Co-attention across biological Networks
     ```
    python main_icon.py config/icon_best_yeast.json
    ```
-4. You can change the hyperparameters or the networks you are integrating by editing or creating a new config file in <code/config>.
+4. You can change the hyperparameters or the networks you are integrating by editing or creating a new config file in code/config.
 
    i. To run co-attention based ablation study on ICoN use the config file: [icon_no-coattn_yeast.json](https://github.com/Murali-group/ICoN/blob/main/code/config/icon_no-coattn_yeast.json)
    
