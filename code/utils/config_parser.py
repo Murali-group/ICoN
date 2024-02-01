@@ -1,3 +1,28 @@
+'''MIT License
+
+Copyright (c) 2020 Duncan Forster
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.'''
+
+
+
+
 import json
 import torch
 import warnings
@@ -31,26 +56,19 @@ class DefaultConfig:
         "gat_type": "single_sep",
         "scale": "sep",
         "feat_type" :'one-hot',
-        "con": True,
+        "con": True, #use co-attention mechanism
         "gat_shapes": {
-            "dimension": 64,  # Dimension of each GAT layer
+            "dimension": 68,  # Dimension of each GAT layer
             "n_heads": 10,  # Number of attention heads for each GAT layer
-            "n_layers": 2,  # Number of GAT layers for each input network
+            "n_layers": 3,  # Number of GAT layers for each input network
             "dropout": 0.4,
             "decay": 0,
-            "free_layers": 0,
         },
         "save_network_scales": False,  # Whether to save internal learned network feature scaling
         "save_model": False,  # Whether to save the trained model or not
         "save_label_predictions": False,  # Whether to save supervised label predictions
         "load_pretrained_model": False,  # Deprecated, see `pretrained_model_path`
         "pretrained_model_path": None,  # Path to pretrained model state dict
-        "tensorboard": {
-            "training": False,  # Whether to use tensorboard to log training metrics
-            "embedding": False,  # Whether to use tensorflow embedding projector
-            "log_dir": None,  # Log directory, default is "runs"
-            "comment": "",  # Comment to add to tensorboard output file name
-        },
         "wandb": {
             "training": False,  # Whether to use wandb to log training metrics
             "validation": False,  # Whether to use wandb to log validation metrics
@@ -58,12 +76,12 @@ class DefaultConfig:
             "log": "",
             "log_freq": 1,
         },
-        "plot_loss": True,  # Whether to plot loss curves
+        "plot_loss": False,  # Whether to plot loss curves
         "save_loss_data": True,  # Whether to save the training loss data in a .tsv file
         "model_parallel": False,  # Whether to distribute the model on multiple CUDA devices
         "mode": 'train',
         "loss_type": 'single',
-        "bmask": True,
+        "bmask": False,
         "norm_adj": False,
         "init_mode": "max_own",
         "agg":"avg",
@@ -201,7 +219,7 @@ class ConfigParser(DefaultConfig):
         namespaced.
 
         Returns:
-            Namespace: A Namespace object containing parsed BIONIC parameters.
+            Namespace: A Namespace object containing parsed ICON parameters.
         """
 
         parsed_params = {

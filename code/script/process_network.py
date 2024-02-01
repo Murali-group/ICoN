@@ -101,12 +101,14 @@ def main(config_path):
 
     #TODO: uncomment for noisy network
     #get noisy network files
-    p=0.3 #add frac p noise to each network
-    noise_list =[p]*len(net_dict.keys())
-    noise_added_net_dict = add_noise_to_networks(net_dict, noise_list, out_dir)
+    ps=[0.3,0.5] #add frac p noise to each network
 
-    #get union of noisy network
-    net_union_wrapper(noise_added_net_dict, out_dir)
+    for p in ps:
+        noise_list =[p]*len(net_dict.keys())
+        noise_added_net_dict = add_noise_to_networks(net_dict, noise_list, out_dir)
+
+        #get union of noisy network
+        net_union_wrapper(noise_added_net_dict, out_dir)
 
 
 

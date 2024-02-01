@@ -1,8 +1,29 @@
+'''MIT License
+
+Copyright (c) 2020 Duncan Forster
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.'''
+
+
 import typer
 from pathlib import Path
-
 import torch
-import itertools
 
 
 def extend_path(path: Path, extension: str) -> Path:
@@ -37,48 +58,5 @@ class Device:
 
     def __new__(cls) -> str:
         return cls._device
-
-def wrapper_generate_combination_dict(config_dict):
-    '''
-    Given a dictionary where a key is a paramater name. We can pass list of values for a certain parameter.
-    Now, our goal is to generate a list of dicts from the original dict such that the keys will be the same,
-    however, each key will have a single value, not a list of values. Also the new list of dicts will cover all combination of
-    parameter values given in original dict.
-    '''
-    #though net_names contain a list of network_names, I do not want to iterate over them separately
-    #hence, converting the list of network names into a string to stop the interation.
-    config_dict['net_names']=  str(config_dict['net_names'])
-
-    #generate combinations for param values mentioned in the gat_shapes dict.
-    config_dict['gat_shapes'] = generate_combination_dict(config_dict['gat_shapes'])
-
-    #generate combinations for param values mentioned in the config_dict
-    configs = generate_combination_dict(config_dict)
-
-    #convert back the list of network names from string to lst
-    for config in configs:
-        config['net_names'] = eval(config['net_names'])
-
-    return configs
-
-def generate_combination_dict(config_dict):
-    '''
-    Given a dictionary where a key is a paramater name. We can pass list of values for a certain parameter.
-    Now, our goal is to generate a list of dicts from the original dict such that the keys will be the same,
-    however, each key will have a single value, not a list of values. Also the new list of dicts will cover all combination of
-    parameter values given in original dict.
-    '''
-    keys = list(config_dict.keys())
-    values_lists = [config_dict[key] if isinstance(config_dict[key], list) else [config_dict[key]] for key in keys]
-    combinations = list(itertools.product(*values_lists))
-
-    result = []
-    for combination in combinations:
-        new_dict = {}
-        for key, value in zip(keys, combination):
-            new_dict[key] = value
-        result.append(new_dict)
-
-    return result
 
 

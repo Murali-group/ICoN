@@ -1,17 +1,9 @@
 import os
-
 import torch
-from torch import Tensor
 import torch_sparse
-
-import scipy.sparse as sp
 import numpy as np
-import time
 from itertools import combinations
 import random
-import matplotlib.pyplot as plt
-
-
 from utils.sampler import Adj
 from torch_geometric.data import Data
 from torch_geometric.transforms import ToSparseTensor
@@ -319,30 +311,3 @@ def process_agg_mat(agg_single_head):
 
     #now slice result matrix along rows and concat the slices along columns.
     return result_matrix
-
-
-def plot_agg_att_mat(agg_attn_mats, epoch_no, noise):
-    '''
-    agg_attns mat is a dictionary with key = (network_no, layer_no) and value=agg_attn at that layer.
-    '''
-    plt_dir= '/home/grads/tasnina/Projects/ICON/plots/ICON/yeast/'
-    for (net_no, layer_no) in agg_attn_mats:
-        agg_attn = agg_attn_mats[(net_no, layer_no)]
-        list_of_heads = agg_attn.unbind(2)
-        # for i in range(len(list_of_heads)):
-        #just one head
-        # plt.imshow(list_of_heads[i].to('cpu').detach().to_dense())
-        agg_single_head = list_of_heads[0].to('cpu').detach().to_dense().numpy()
-        agg_single_head = process_agg_mat(agg_single_head)
-
-        plt.scatter(agg_single_head[:, 0], agg_single_head[:, 1])
-        plt.xlabel('self_attn')
-        plt.ylabel('out_attn')
-
-        plt.title(f'noise_{noise}_e_{epoch_no}_net_{net_no}_l_{layer_no}_head_0')
-
-        plt.show()
-        filename= plt_dir + f'noise_{noise}_e_{epoch_no}_net_{net_no}_l_{layer_no}_head_0.png'
-        os.makedirs(os.path.dirname(filename), exist_ok=True)
-        plt.savefig(filename)
-
