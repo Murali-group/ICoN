@@ -3,7 +3,6 @@ import json
 from typing import Union
 from utils.common import *
 from utils.param_process import *
-
 from train_icon_noise import Trainer
 
 def main(config_path: Union[Path, dict]):
@@ -18,7 +17,7 @@ def main(config_path: Union[Path, dict]):
 
 if __name__ == "__main__":
     if len(sys.argv) == 1: #if no argument passed, use a default config file.
-        config_path = Path('config/icon_no-noise_yeast.json')
+        config_path = Path('code/config/icon_no-noise_yeast.json')
     else:
         config_path = Path(sys.argv[1])
 

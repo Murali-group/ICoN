@@ -1,10 +1,10 @@
 {
   "net_names": [
-    "/home/grads/tasnina/Submission_Projects/ICoN/inputs/Costanzo-2016.txt",
-    "/home/grads/tasnina/Submission_Projects/ICoN/inputs/Hu-2007.txt",
-    "/home/grads/tasnina/Submission_Projects/ICoN/inputs/Krogan-2006.txt"
+    "inputs/Costanzo-2016.txt",
+    "inputs/Hu-2007.txt",
+    "inputs/Krogan-2006.txt"
   ],
-  "out_name": "/home/grads/tasnina/Submission_Projects/ICoN/outputs/yeast_gi_coex_ppi",
+  "out_name": "outputs/yeast_gi_coex_ppi",
   "epochs":3000,
   "batch_size": 2048,
   "learning_rate": 0.0005,
