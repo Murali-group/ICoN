@@ -3,9 +3,9 @@ Integration using Co-attention across biological Networks
 
 ## Generate protein embedding
 1. To set up the environment, run the commands in icon_env.txt file.
-2. To run ICoN with the best hyperparameters on yeast networks, run (inside code folder)
+2. To run ICoN with the best hyperparameters on yeast networks, run (from project folder)
     ```
-   python main_icon.py config/icon_best_yeast.json
+   python code/main_icon.py code/config/icon_best_yeast.json
    ```
 4. You can change the hyperparameters or the networks you are integrating by editing or creating a new config file in code/config.
 
