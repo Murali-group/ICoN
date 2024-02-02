@@ -1,7 +1,7 @@
 # Evaluate ICoN
 To evaluate ICoN in terms of downstream tasks: i. gene module detection, ii.gene coannotation prediction, and  iii. gene function prediction we utilized [BIONIC-evals](https://github.com/duncster94/BIONIC-evals).
 
-We have provided the [datasets](https://github.com/Murali-group/ICoN/tree/main/eval/datasets/), [standards](https://github.com/Murali-group/ICoN/tree/main/eval/standards), [config](https://github.com/Murali-group/ICoN/tree/main/eval/config/), and [script](https://github.com/Murali-group/ICoN/tree/main/eval/script) used in creating figures in the manuscript of ICoN. To reproduce these figures follow the instructions below:
+We have provided the [datasets](https://github.com/Murali-group/ICoN/tree/main/eval/datasets/) (embeddings generated from 1 run of models), [standards](https://github.com/Murali-group/ICoN/tree/main/eval/standards), [config](https://github.com/Murali-group/ICoN/tree/main/eval/config/), and [script](https://github.com/Murali-group/ICoN/tree/main/eval/script) used in creating figures in the manuscript of ICoN. To reproduce these figures (for one run) follow the instructions below:
 1. First install BIONIC-evals following the instructions given in [BIONIC-evals](https://github.com/duncster94/BIONIC-evals)
 2. Place our provided <script> folder inside <BIONIC-evals/bioniceval>. 
 3. Now replace the following folders in <BIONIC-evals/bioniceval> with our provided folders [here](https://github.com/Murali-group/ICoN/tree/main/eval):
@@ -17,7 +17,6 @@ We have provided the [datasets](https://github.com/Murali-group/ICoN/tree/main/e
    ```
    python paper_plots.py <bionic_eval_results_folder>
    ```
-
 ## ii. Ablation study of ICoN:
 ### Co-attention
 1. Run BIONIC-evals with <config/single_runs/ablation_nocoattn.json>
