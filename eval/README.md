@@ -1,10 +1,10 @@
 # Evaluate ICoN
 To evaluate ICoN in terms of downstream tasks: i. gene module detection, ii.gene coannotation prediction, and  iii. gene function prediction we utilized [BIONIC-evals](https://github.com/duncster94/BIONIC-evals).
 
-We have provided the [datasets](https://github.com/Murali-group/ICoN/tree/main/eval/datasets/), [standards](https://github.com/Murali-group/ICoN/tree/main/eval/standards), [config](https://github.com/Murali-group/ICoN/tree/main/eval/config/), and [script](https://github.com/Murali-group/ICoN/tree/main/eval/script) used in creating figured in the manuscript of ICoN. To reproduce these figures follow the instructions below:
-1. First install BIONIC-evals following the instructions given here in [BIONIC-evals](https://github.com/duncster94/BIONIC-evals)
+We have provided the [datasets](https://github.com/Murali-group/ICoN/tree/main/eval/datasets/), [standards](https://github.com/Murali-group/ICoN/tree/main/eval/standards), [config](https://github.com/Murali-group/ICoN/tree/main/eval/config/), and [script](https://github.com/Murali-group/ICoN/tree/main/eval/script) used in creating figures in the manuscript of ICoN. To reproduce these figures follow the instructions below:
+1. First install BIONIC-evals following the instructions given in [BIONIC-evals](https://github.com/duncster94/BIONIC-evals)
 2. Place our provided <script> folder in <BIONIC-evals/bioniceval> folder. 
-3. Now replace the following folders in <BIONIC-evals/bioniceval> with our provided folders [here](https://github.com/Murali-group/ICoN/tree/main/eval) under the same names:
+3. Now replace the following folders in <BIONIC-evals/bioniceval> with our provided folders [here](https://github.com/Murali-group/ICoN/tree/main/eval):
    i. datasets
    ii. config
    iii. standards
