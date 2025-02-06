@@ -1,5 +1,6 @@
-# ICoN
-Integration using Co-attention across biological Networks
+# ICoN: Integration using Co-attention across biological Networks
+We propose ICoN, a novel unsupervised graph neural network model that takes multiple protein–protein association networks as inputs and generates a feature representation for each protein that integrates the topological information from all the networks. A key contribution of ICoN is exploiting a mechanism called “co-attention” that enables cross-network communication during training. The model also incorporates a denoising training technique, introducing perturbations to each input network and training the model to reconstruct the original network from its corrupted version. Our experimental results demonstrate that ICoN surpasses individual networks across three downstream tasks: gene module detection, gene coannotation prediction, and protein function prediction. Compared to existing unsupervised network integration models, ICoN exhibits superior performance across the majority of downstream tasks and shows enhanced robustness against noise. This work introduces a promising approach for effectively integrating diverse protein–protein association networks, aiming to achieve a biologically meaningful representation of proteins.
+
 
 ## Generate protein embedding
 1. To set up the environment, run the commands in icon_env.txt file.
@@ -65,7 +66,8 @@ Run:
    ```
    python noise_robustness.py <bionic_eval_results_folder>
    ```
-
+## Publication: 
+Nure Tasnina, T M Murali, ICoN: integration using co-attention across biological networks, Bioinformatics Advances, Volume 5, Issue 1, 2025, vbae182, https://doi.org/10.1093/bioadv/vbae182
 
 ## References
 <a id="1">[1]</a> 
